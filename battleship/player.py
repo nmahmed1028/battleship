@@ -13,7 +13,7 @@ class Player():
     def attack(self): #select target on board to attack
         pass
 
-    def wasShipHit(self): #see if own ship was hit by other player's attack
+    def wasShipHit(self, x, y): #see if own ship was hit by other player's attack
         #check other player's most recent attack coords (x and y input)
         #compare it with ship placements on shipBoard, change ship status accordingly
         #this might make more sense to add to board.py idk 
