@@ -1,51 +1,89 @@
 # import platform
-import pygame
+import pygame as pg
+import pygame_widgets as pw
 # import class objects
-import battleship
+from battleship.button import ClickableButton
+from enum import Enum
+import os
+
+class State(Enum):
+    START = 1
+
+game_state = State(1)
+
+main_dir = os.path.split(os.path.abspath(__file__))[0]
+data_dir = os.path.join(main_dir, "data")
+# functions to create our resources
+def load_image(name, scale=1):
+    fullname = os.path.join(data_dir, name)
+    image = pg.image.load(fullname)
+    image = image.convert()
+
+    # size = image.get_size()
+    # size = (size[0] * scale, size[1] * scale)
+    # image = pg.transform.scale(image, size)
+
+    return image, image.get_rect()
 
 def run():
     # pygame setup
-    pygame.init()
+    pg.init()
     # set screen size
-    screen = pygame.display.set_mode((1280, 720))
-    clock = pygame.time.Clock() # keep to limit framerate
+    screen = pg.display.set_mode((1280, 720))
+    background = pg.Surface(screen.get_size())
+    background = background.convert()
+    background.fill("grey")
+
+    pg.display.set_caption("Battleship")
+    clock = pg.time.Clock() # keep to limit framerate
     running = True # track if loop should keep running
-    dt = 0
 
-    player_pos = pygame.Vector2(screen.get_width() / 2, screen.get_height() / 2)
+    middle = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
+    startBtn = ClickableButton("Start", (250, 100), (middle.x - 125, middle.y + 200))
     while running:
+        # limits FPS to 60
+        tick = clock.tick(60)
+
         # poll for events
         # pygame.QUIT event means the user clicked X to close the window
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.QUIT:
                 running = False
 
         # fill the screen with a color to wipe away anything from last frame
-        screen.fill("purple")
+        background.fill("grey")
 
-        pygame.draw.circle(screen, "red", player_pos, 40)
+        keys = pg.key.get_pressed()
+        if keys[pg.K_w]:
+            pass
+        if keys[pg.K_s]:
+            pass
+        if keys[pg.K_a]:
+            pass
+        if keys[pg.K_d]:
+            pass
 
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w]:
-            player_pos.y -= 300 * dt
-        if keys[pygame.K_s]:
-            player_pos.y += 300 * dt
-        if keys[pygame.K_a]:
-            player_pos.x -= 300 * dt
-        if keys[pygame.K_d]:
-            player_pos.x += 300 * dt
+        if game_state == State.START:
+            # Put Text On The Background, Centered
+            if pg.font:
+                # img, rect = load_image("battleship_fontbolt.png")
+                img = pg.image.load(os.path.join("data/battleship_fontbolt.png"))
+                img.convert()
+                img_size = img.get_size()
+                background.blit(img, (middle.x - img_size[0]/2, 100))
+
+            startBtn.draw(screen)
+
+        screen.blit(background, (0, 0))
+        pw.update(events)  # Call once every loop to allow widgets to render and listen
+        pg.display.update()
 
         # flip() the display to put the work we did on screen
-        pygame.display.flip()
+        pg.display.flip()
 
-        # limits FPS to 60
-        tick = clock.tick(60)
-        # dt is delta time in seconds since last frame, used for framerate-
-        # independent physics.
-        dt = tick / 1000
-
-    pygame.quit()
+    pg.quit()
 
 def main():
     # run main loop
