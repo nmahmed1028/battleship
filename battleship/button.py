@@ -2,17 +2,14 @@ import pygame_widgets
 from pygame_widgets.button import Button
 
 class ClickableButton:
-    def __init__(self, txt, widthHeight=tuple, xy=tuple) -> None:
+    def __init__(self, txt, widthHeight=tuple, xy=tuple, whenClicked=lambda: print("Clicked")) -> None:
         self.txt = txt
         self.widthHeight = widthHeight
-        self.xy = xy
+        self.xy = xy # top left start
         self.btn = None
-        # self.cb = whenClicked
+        self.cb = whenClicked
 
-    def draw(self, screen):
-        if self.btn:
-            return
-
+    def draw(self, screen, events):
         self.btn = Button(
             screen, # surface to place button on
             self.xy[0],  # X-coordinate of top left corner
@@ -25,5 +22,9 @@ class ClickableButton:
             hoverColour=(150, 0, 0),  # Color of button when being hovered over
             pressedColour=(0, 200, 20),  # Color of button when being clicked
             radius=20,
-            onClick=lambda: print("clicked")
+            onClick=self.cb,
+            onClickParams=[self],
+            onRelease=lambda: print("released")
         )
+        self.btn.listen(events)
+        self.btn.draw()
