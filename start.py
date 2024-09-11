@@ -36,9 +36,14 @@ def run():
     pg.init()
     # set screen size
     screen = pg.display.set_mode((1280, 720))
+    screen.fill("grey")
     background = pg.Surface(screen.get_size())
     background = background.convert()
     background.fill("grey")
+
+    screen.blit(background, (0,0))
+    pg.display.update()
+
     global game_state
     game_state = State.START
 
@@ -51,13 +56,10 @@ def run():
     def cb(self):
         print("button cb")
         globals().update(game_state=State.PICK_SHIPS)
+        del self
     startBtn = ClickableButton("Start", (250, 100), (middle.x - 125, middle.y + 200), cb)
-
     boardGrid = Board()
     while running:
-        # limits FPS to 60
-        tick = clock.tick(60)
-
         # poll for events
         # pygame.QUIT event means the user clicked X to close the window
         events = pg.event.get()
@@ -66,9 +68,11 @@ def run():
                 running = False
 
         # fill the screen with a color to wipe away anything from last frame
+        background = 0
         background = pg.Surface(screen.get_size())
         background = background.convert()
         background.fill("grey")
+        screen.fill("grey")
 
         keys = pg.key.get_pressed()
         if keys[pg.K_w]:
@@ -87,25 +91,35 @@ def run():
             img.convert()
             img_size = img.get_size()
             background.blit(img, (middle.x - img_size[0]/2, 100))
+
             startBtn.draw(background, events)
-            print("start state")
-        elif game_state == State.PICK_SHIPS:
+            startBtn.btn.show()
+        else:
+            # make start button is disabled
+            startBtn.btn.hide()
+            startBtn.btn.disable()
+
+        if game_state == State.PICK_SHIPS:
             img = pg.image.load(os.path.join("data/battleship_fontbolt.png"))
             img.convert()
             img_size = img.get_size()
             background.blit(img, (middle.x - img_size[0]/2, 100))
             boardGrid.draw(background, middle.x - 200/2, 500) # todo move this to other state
-            print("pick ships state")
+        else:
             pass
-        elif game_state == State.PLAYER1START:
+
+        if game_state == State.PLAYER1START:
             pass
 
         pw.update(events)  # Call once every loop to allow widgets to render and listen
         screen.blit(background, (0, 0))
 
         # flip() the display to put the work we did on screen
-        # pg.display.update()
-        pg.display.flip()
+        pg.display.update()
+        # pg.display.flip()
+
+        # limits FPS to 60
+        tick = clock.tick(60)
 
     pg.quit()
 

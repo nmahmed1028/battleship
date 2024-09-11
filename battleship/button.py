@@ -9,6 +9,9 @@ class ClickableButton:
         self.btn = None
         self.cb = whenClicked
 
+    def __del__(self):
+        self.btn.disable()
+
     def draw(self, screen, events):
         self.btn = Button(
             screen, # surface to place button on
