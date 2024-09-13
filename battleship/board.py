@@ -29,14 +29,14 @@ class Board:
         # always 10x10
         self.gameBoard = [EMPTY_ROW for i in range(10)]
 
-    def draw(self, screen, x, y):
+    def draw(self, screen, x, y, size=200):
         BLACK = (0, 0, 0)
         WHITE = (200, 200, 200)
 
         # given x is left
         # given y is top
-        BOARD_WIDTH = 200
-        BOARD_HEIGHT = 200
+        BOARD_WIDTH = size
+        BOARD_HEIGHT = size
         blockSize = int(BOARD_WIDTH / 10) # Set the size of the grid block
         x = int(x)
         y = int(y)

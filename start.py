@@ -18,6 +18,7 @@ class State(Enum):
     PLAYER2TURN = 6
 
 game_state = State.START
+num_ships = 1
 
 main_dir = os.path.split(os.path.abspath(__file__))[0]
 data_dir = os.path.join(main_dir, "data")
@@ -48,6 +49,8 @@ def run():
 
     global game_state
     game_state = State.START
+    global num_ships
+    num_ships = 1
 
     pg.display.set_caption("Battleship")
     clock = pg.time.Clock() # keep to limit framerate
@@ -56,7 +59,7 @@ def run():
     middle = pg.Vector2(screen.get_width() / 2, screen.get_height() / 2)
 
     def cb(self):
-        print("button cb")
+        print("Start button cb")
         globals().update(game_state=State.PICK_SHIPS)
         del self
     startBtn = ClickableButton("Start", (250, 100), (middle.x - 125, middle.y + 200), cb)
@@ -64,7 +67,10 @@ def run():
     def txtCb(txt):
         text = ''.join(txt)
         match = re.match("[1-5]", text)
-        print(match)
+        print(f"num ships: {match[0]}")
+        if match:
+            globals().update(game_state=State.PLAYER1START)
+            globals().update(num_ships=match[0])
 
     shipTxtbox = TextBox(background, middle.x - 30, middle.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
     shipTxtbox.onSubmitParams = [shipTxtbox.text]
@@ -123,11 +129,14 @@ def run():
         else:
             shipTxtbox.hide()
             shipTxtbox.disable()
-            pass
 
         if game_state == State.PLAYER1START:
-            boardGrid.draw(background, middle.x - 200/2, 500) # todo move this to other state
-            pass
+            size = 500
+            boardGrid.draw(background, middle.x - size/2, middle.y - size/2, size)
+
+            my_font = pg.font.Font(pg.font.get_default_font(), 56)
+            text_surface = my_font.render('PLAYER 1, PLACE SHIPS', False, (0, 0, 0))
+            background.blit(text_surface, (middle.x - text_surface.get_width()/2, 30))
         else:
             pass
 
