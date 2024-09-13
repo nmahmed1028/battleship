@@ -1,11 +1,13 @@
 # import platform
 import pygame as pg
 import pygame_widgets as pw
+from pygame_widgets.textbox import TextBox
 # import class objects
 from battleship.button import ClickableButton
 from battleship.board import Board
 from enum import Enum
 import os
+import re
 
 class State(Enum):
     START = 1
@@ -58,6 +60,14 @@ def run():
         globals().update(game_state=State.PICK_SHIPS)
         del self
     startBtn = ClickableButton("Start", (250, 100), (middle.x - 125, middle.y + 200), cb)
+
+    def txtCb(txt):
+        text = ''.join(txt)
+        match = re.match("[1-5]", text)
+        print(match)
+
+    shipTxtbox = TextBox(background, middle.x - 30, middle.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
+    shipTxtbox.onSubmitParams = [shipTxtbox.text]
     boardGrid = Board()
     while running:
         # poll for events
@@ -68,9 +78,6 @@ def run():
                 running = False
 
         # fill the screen with a color to wipe away anything from last frame
-        background = 0
-        background = pg.Surface(screen.get_size())
-        background = background.convert()
         background.fill("grey")
         screen.fill("grey")
 
@@ -94,6 +101,7 @@ def run():
 
             startBtn.draw(background, events)
             startBtn.btn.show()
+            startBtn.btn.enable()
         else:
             # make start button is disabled
             startBtn.btn.hide()
@@ -104,11 +112,23 @@ def run():
             img.convert()
             img_size = img.get_size()
             background.blit(img, (middle.x - img_size[0]/2, 100))
-            boardGrid.draw(background, middle.x - 200/2, 500) # todo move this to other state
+
+            my_font = pg.font.Font(pg.font.get_default_font(), 36)
+            text_surface = my_font.render('Choose number of ships [1-5]', False, (0, 0, 0))
+            background.blit(text_surface, (middle.x - text_surface.get_width()/2, middle.y + 150))
+
+            shipTxtbox.draw()
+            shipTxtbox.show()
+            shipTxtbox.enable()
         else:
+            shipTxtbox.hide()
+            shipTxtbox.disable()
             pass
 
         if game_state == State.PLAYER1START:
+            boardGrid.draw(background, middle.x - 200/2, 500) # todo move this to other state
+            pass
+        else:
             pass
 
         pw.update(events)  # Call once every loop to allow widgets to render and listen
