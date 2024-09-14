@@ -137,6 +137,32 @@ def run():
             my_font = pg.font.Font(pg.font.get_default_font(), 56)
             text_surface = my_font.render('PLAYER 1, PLACE SHIPS', False, (0, 0, 0))
             background.blit(text_surface, (middle.x - text_surface.get_width()/2, 30))
+
+            #testing mouse movement
+            #these lines just draw some squares for testing
+            boxes = []
+            for i in range(5):
+                box = pg.Rect(50 + i*40, 40, 30, 20)
+                boxes.append(box)
+            active_box = None
+            for box in boxes:
+                pg.draw.rect(background, "purple", box)
+
+            for event in pg.event.get():
+                if event.type == pg.MOUSEBUTTONDOWN: #if mouse clicked
+                    #if event.button == 1: #if left mouse button clicked
+                    for num, box in enumerate(boxes): #track index # of boxes
+                        if box.collidepoint(event.pos): #checks for collision w/ mouse coords
+                            active_box = num #if collide, update active_box w/ box's index val
+                if event.type == pg.MOUSEMOTION: #if mouse moved
+                    if active_box != None: #check if box has been clicked on and checks its number
+                        boxes[active_box].move_ip(event.rel) #pick box from list and move it by same amount as mouse
+                if event.type == pg.MOUSEBUTTONUP: #if mouse released
+                    if event.button == 1:
+                        active_box = None
+            for box in boxes:
+                pg.draw.rect(background, "purple", box)
+            pg.display.flip()
         else:
             pass
 
