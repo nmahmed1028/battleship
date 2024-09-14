@@ -47,13 +47,6 @@ class Board:
                 pg.draw.rect(screen, BLACK, rect, 1)
 
     def addToBoard(self, ship=Ship):
+        #update array w/ ship position based off of where it is placed on the board
         print("drawing ship")
-        pass
-
-    def addToBoard(self, x=int):
-        print("drawing int")
-        pass
-
-    def addToBoard(self, z=str):
-        print("drawing str")
         pass
