@@ -80,16 +80,16 @@ class Board:
 
     def place_ship(self, ship, x, y, horizontal):
         if horizontal:
-            if x + ship.size > GRID_SIZE:
+            if x + ship.size > 10: #10 is the grid size
                 return False
-            for i in range(ship.size):
+            for i in range(ship.size): 
                 if self.grid[y][x + i] != 0:
                     return False
             for i in range(ship.size):
                 self.grid[y][x + i] = ship
                 ship.positions.append((x + i, y))
         else:
-            if y + ship.size > GRID_SIZE:
+            if y + ship.size > 10: # 10 is the grid size
                 return False
             for i in range(ship.size):
                 if self.grid[y + i][x] != 0:
