@@ -8,6 +8,7 @@ from battleship.board import Board
 from enum import Enum
 import os
 import re
+from battleship.board import Ship
 
 class State(Enum):
     START = 1
@@ -80,7 +81,8 @@ def run():
     ships = []
     #these lines draw boxes for testing mouse movement --> either replace w/ ship object or delete
     for i in range(5):
-        ship = pg.Rect(50 + i*40, 40, 30, 20)
+        ship = Ship(i + 1)
+        #ship = pg.Rect(50 + i*40, 40, 30, 20)
         ships.append(ship)
     active_ship = None
 
@@ -93,14 +95,20 @@ def run():
                 running = False
 
             #mouse movement
+            '''ROTATION IS STILL WONKY, NEEDS TO BE TWEAKED'''
             if event.type == pg.MOUSEBUTTONDOWN: #if mouse clicked
                 for num, ship in enumerate(ships): #track index # of ships
                     if ship.collidepoint(event.pos): #checks for collision w/ mouse coords
                         active_ship = num #if collide, update active_ship w/ ship's index val
+                        '''if keys[pg.K_r]: #if r key pressed while dragging
+                            ships[active_ship].rotate90() #rotate ship'''
                         break
 
             if event.type == pg.MOUSEMOTION and active_ship != None: #if mouse moved and there is active ship
-                ships[active_ship].move_ip(event.rel) #pick ship from list and move it by same amount as mouse
+                ships[active_ship].move(event.rel) #pick ship from list and move it by same amount as mouse
+                if keys[pg.K_r]: #if r key pressed while dragging
+                            print("r pressed") #debugging
+                            ships[active_ship].rotate90() #rotate ship
 
             if event.type == pg.MOUSEBUTTONUP: #if mouse released
                 if active_ship is not None: #if ship active
@@ -165,7 +173,8 @@ def run():
 
             #draw boxes ----> will have to replace w/ ship object       
             for ship in ships:
-                pg.draw.rect(background, "purple", ship)
+                #pg.draw.rect(background, "purple", ship)
+                ship.draw(background)
             
             """
             Outline for the rest of functionality
