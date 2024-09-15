@@ -174,6 +174,8 @@ def run():
             #draw boxes ----> will have to replace w/ ship object       
             for ship in ships:
                 #pg.draw.rect(background, "purple", ship)
+                if ships.index(ship) == active_ship:
+                    pg.draw.rect(background, "red", ship.rect.inflate(10, 10), 2)  # Draw a red outline on the ship player is actively moving
                 ship.draw(background)
             
             """
