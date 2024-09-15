@@ -167,6 +167,41 @@ def run():
             for ship in ships:
                 pg.draw.rect(background, "purple", ship)
             
+            """
+            Outline for the rest of functionality
+            Place Ship object
+            Confirm placement
+            Change screen to a blank screen with a button that says
+            'Player two press to start turn'
+            Swithces to Player 2 start state when clicked
+            """
+        if game_state == State.PLAYER2START:
+            pass
+            '''
+            Copy of Player 1 start
+            Except confirmation sends the start to player 1 start
+            '''
+        
+        if game_state == State.PLAYER1TURN:
+            pass
+            '''
+            Look at hits on their board
+            Moves to attack phase and confirms hits
+            Check victory condition
+            on miss switch to transition screen
+            switch to player 2 turn
+            '''
+
+        if game_state == State.PLAYER2TURN:
+            pass
+            '''
+            Look at hits on their board
+            Moves to attack phase and confirms hits
+            Check victory condition
+            on miss switch to transition screen
+            switch to player 1 turn
+            '''
+            
 
         screen.blit(background, (0, 0))
         pw.update(events)  # Call once every loop to allow widgets to render and listen
