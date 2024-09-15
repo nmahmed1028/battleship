@@ -1,5 +1,6 @@
 import pygame_widgets
 import pygame as pg
+import os
 
 # Should be a widget (draws a board)
 # Stores an array
@@ -14,14 +15,37 @@ import pygame as pg
 EMPTY_ROW = [0 for i in range(10)]
 
 class Ship:
-    def __init__(self, size) -> None:
-        self.x = 1
-        self.y = size # number 1-5 s.t. the ship is 1x(size)
+    def __init__(self, size, x=0, y=0) -> None:
+        #self.x = 1
+        #self.y = size # number 1-5 s.t. the ship is 1x(size)
+        self.x = x #x position
+        self.y = y #y position
+        self.width = 70 * size  # placeholder
+        self.height = 50  # Height is based on ship size
+        self.rect = pg.Rect(self.x, self.y, self.width, self.height)  #create rectangle for the ship for mouse movement purposes
+        self.image = self.load_ship_image(size)  #assign image to shape based on size
+
+    def load_ship_image(self, size):
+        image_path = os.path.join("data", f"ship_{size}.png") #get image path based on given size
+        image = pg.image.load(image_path).convert_alpha() #load image from path
+        scaled = pg.transform.scale(image, (self.width, self.height)) #scale image based on dimensions
+        return scaled
 
     def rotate90(self):
-        y = self.y
-        self.y = self.x
-        self.x = y
+        self.x, self.y = self.y, self.x  #swap coords
+        self.image = pg.transform.rotate(self.image, 90)  #rotate image
+        self.width, self.height = self.height, self.width #swap height/width
+        self.rect.width, self.rect.height = self.rect.height, self.rect.width  #swap width/height for the rect
+
+    def move(self, offset):
+        self.rect.move_ip(offset)  #move the ship's rectangle
+        self.x, self.y = self.rect.topleft  #update the ship's coordinates
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect.topleft)  #draw ship based on rect's position
+
+    def collidepoint(self, pos):
+        return self.rect.collidepoint(pos)  #use pygame's rect's collidepoint to determine interaction with mouse
 
 # Will have to be able to support a ship board or a attack board
 class Board:
