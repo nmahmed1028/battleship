@@ -31,9 +31,24 @@ def load_image(name, scale=1):
 
     return image, image.get_rect()
 
-def draw_board():
+def draw_board(screen, board):
     # TODO
-    pass
+    my_font = pg.font.Font(pg.font.get_default_font(), 36)
+    x_offset = 0
+    GRID_SIZE = 10
+    MARGIN = 50
+    CELL_SIZE = 40
+    for y in range(GRID_SIZE):
+        for x in range(GRID_SIZE):
+            rect = pg.Rect(x_offset + x * CELL_SIZE, MARGIN + y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+            pg.draw.rect(screen, (0, 0, 0), rect, 1)
+            if board.gameBoard[y][x] == -1: #-1 on the grid indicates a miss
+                pg.draw.circle(screen, (0,0,255), rect.center, CELL_SIZE // 4)
+            elif board.gameBoard[y][x] == -2: #-2 on the grid indicates a hit
+                pg.draw.circle(screen, (255, 0, 0), rect.center, CELL_SIZE // 4)
+            #elif isinstance(board.grid[y][x], Ship) and not hide_ships:
+                #pg.draw.rect(screen, GRAY, rect)
+
 
 def start_game(screen, background, clock):
     globals().update(game_over=False)
@@ -178,11 +193,16 @@ def run():
     clock = pg.time.Clock() # keep to limit framerate
     running = True # track if loop should keep running
 
+    player1_board = Board()
+    player2_board = Board()
+
     if not start_game(screen, background, clock):
         return
 
     if not choose_gamemode(screen, background, clock):
         return
+    
+    draw_board(screen,player1_board)
 
     # placeholder loop until all other states are finished
     while running:
