@@ -25,6 +25,13 @@ class Ship:
         self.rect = pg.Rect(self.x, self.y, self.width, self.height)  #create rectangle for the ship for mouse movement purposes
         self.image = self.load_ship_image(size)  #assign image to shape based on size
 
+        self.size = size
+        self.hits = 0
+        self.positions = []
+
+    def is_sunk(self):
+        return self.hits == self.size
+
     def load_ship_image(self, size):
         image_path = os.path.join("data", f"ship_{size}.png") #get image path based on given size
         image = pg.image.load(image_path).convert_alpha() #load image from path
@@ -52,6 +59,7 @@ class Board:
     def __init__(self) -> None:
         # always 10x10
         self.gameBoard = [EMPTY_ROW for i in range(10)]
+        self.ships = []
 
     def draw(self, screen, x, y, size=200):
         BLACK = (0, 0, 0)
@@ -70,7 +78,35 @@ class Board:
                 rect = pg.Rect(xDraw, yDraw, blockSize, blockSize)
                 pg.draw.rect(screen, BLACK, rect, 1)
 
-    def addToBoard(self, ship=Ship):
-        #update array w/ ship position based off of where it is placed on the board
-        print("drawing ship")
-        pass
+    def place_ship(self, ship, x, y, horizontal):
+        if horizontal:
+            if x + ship.size > GRID_SIZE:
+                return False
+            for i in range(ship.size):
+                if self.grid[y][x + i] != 0:
+                    return False
+            for i in range(ship.size):
+                self.grid[y][x + i] = ship
+                ship.positions.append((x + i, y))
+        else:
+            if y + ship.size > GRID_SIZE:
+                return False
+            for i in range(ship.size):
+                if self.grid[y + i][x] != 0:
+                    return False
+            for i in range(ship.size):
+                self.grid[y + i][x] = ship
+                ship.positions.append((x, y + i))
+        self.ships.append(ship)
+        return True
+
+    def receive_attack(self, x, y):
+        if self.grid[y][x] == 0:
+            self.grid[y][x] = -1  # Miss
+            return False
+        elif isinstance(self.grid[y][x], Ship):
+            ship = self.grid[y][x]
+            ship.hits += 1
+            self.grid[y][x] = -2  # Hit
+            return True
+        return False
