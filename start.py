@@ -158,6 +158,10 @@ def choose_gamemode():
     
     return True
 
+MARGIN = 50
+X_OFFSET = 360
+CELL_SIZE = 60
+GRID_SIZE = 10
 def player_place_ships(screen, board, clock):
     """
     Outline for the rest of functionality
@@ -169,10 +173,6 @@ def player_place_ships(screen, board, clock):
     """
     ships = [Ship(i+1) for i in range(num_ships)]  # Add ship sizes based on your design
     font = pg.font.Font(None, 36)
-    MARGIN = 50
-    X_OFFSET = 360
-    CELL_SIZE = 60
-    GRID_SIZE = 10
 
     for ship in ships:
         placing = True
@@ -273,7 +273,14 @@ def transition_between_turns(pnum):
 
         pg.display.flip()
 
-def player1_turn():
+def check_victory(board):
+    for row in board.gameBoard:
+        for cell in row:
+            if isinstance(cell, Ship):
+                return False  # If there is at least one ship that hasn't been hit, no victory yet.
+    return True  # If all ships have been hit, declare victory.
+
+def player_turn(board, pnum):
     '''
     Look at hits on their board
     Moves to attack phase and confirms hits
@@ -281,17 +288,41 @@ def player1_turn():
     on miss switch to transition screen
     switch to player 2 turn
     '''
-    pass
+    attacking = True
+    while attacking:
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.QUIT:
+                pg.quit()
+                return False
 
-def player2_turn():
-    '''
-    Look at hits on their board
-    Moves to attack phase and confirms hits
-    Check victory condition
-    on miss switch to transition screen
-    switch to player 1 turn
-    '''
-    pass
+            if event.type == pg.MOUSEBUTTONDOWN:
+                x, y = pg.mouse.get_pos()
+                grid_x = (x - X_OFFSET) // CELL_SIZE  # Adjust grid based on offset and cell size
+                grid_y = (y - MARGIN) // CELL_SIZE
+
+                if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                    cell_value = board.gameBoard[grid_y][grid_x]
+                    if cell_value == 0:  # Miss
+                        print(f"Miss at ({grid_x}, {grid_y})")
+                        board.gameBoard[grid_y][grid_x] = -1
+                        attacking = False  # End turn after miss
+                    elif cell_value > 0:  # Hit
+                        print(f"Hit at ({grid_x}, {grid_y})")
+                        board.gameBoard[grid_y][grid_x] = -2
+                        # Check if the game is over
+                        if check_victory(board):
+                            globals().update(game_over=True)
+                            print(f"Player {pnum} wins!")
+                            return
+                        else:
+                            attacking = False  # End turn after a successful hit
+                    else:
+                        print("Already attacked this cell")
+
+        draw_board(board, X_OFFSET, MARGIN)
+        pg.display.flip()
+        CLOCK.tick(60)
 
 def receive_attack(self, x, y):
     if self.gameBoard[y][x] == 0:
@@ -348,48 +379,41 @@ def run():
     if not choose_gamemode():
         return -1
 
-    ships_placed = 0
-    while ships_placed < num_ships:
-        player_place_ships(SCREEN, player1_board, CLOCK)
-        transition_between_turns(2)
-        player_place_ships(SCREEN, player2_board, CLOCK)
-        transition_between_turns(1)
-        ships_placed += 1
+    player_place_ships(SCREEN, player1_board, CLOCK)
+    transition_between_turns(2)
+    player_place_ships(SCREEN, player2_board, CLOCK)
+    transition_between_turns(1)
+    print(player1_board.gameBoard)
+    print(player2_board.gameBoard)
 
-    # draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
-    # transition_between_turns(3) #Test Call last number is the player who's turn is next
-    # player_place_ships(SCREEN, player1_board, CLOCK)
-
-    # placeholder loop until all other states are finished
-    while running:
-        events = pg.event.get()
-        for event in events:
-            if event.type == pg.QUIT:
-                running = False
-        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
-        SCREEN.fill("grey")
-        SCREEN.blit(BACKGROUND, (0, 0))
-        pw.update(events)  # Call once every loop to allow widgets to render and listen
+    # # placeholder loop until all other states are finished
+    # while running:
+    #     events = pg.event.get()
+    #     for event in events:
+    #         if event.type == pg.QUIT:
+    #             running = False
+    #     BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+    #     SCREEN.fill("grey")
+    #     SCREEN.blit(BACKGROUND, (0, 0))
+    #     pw.update(events)  # Call once every loop to allow widgets to render and listen
         
-        # flip() the display to put the work we did on screen
-        pg.display.flip()
+    #     # flip() the display to put the work we did on screen
+    #     pg.display.flip()
 
-        tick = CLOCK.tick(60) # limits FPS to 60
-        # player1_place_ships(SCREEN,player1_board,CLOCK)
+    #     tick = CLOCK.tick(60) # limits FPS to 60
+    #     # player1_place_ships(SCREEN,player1_board,CLOCK)
 
     global game_over
-    globals().update(game_over=True)
     while not game_over:
-        player_place_ships(SCREEN, player1_board, CLOCK)
         transition_between_turns(1)
-        player1_turn()
-        #display_attack_result(1)
+        player_turn(player2_board, 1)
+        # display_attack_result(1)
         if game_over:
             break
 
         transition_between_turns(2)
-        player2_turn()
-        #display_attack_result(2)
+        player_turn(player1_board, 2)
+        # display_attack_result(2)
         if game_over:
             break
 
