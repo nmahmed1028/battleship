@@ -11,6 +11,8 @@ import os
 import re
 from battleship.board import Ship
 
+DEBUG = True
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 MIDDLE = pg.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -29,20 +31,7 @@ GREEN = (0, 255, 0)
 
 num_ships = None
 game_over = False
-
-main_dir = os.path.split(os.path.abspath(__file__))[0]
-data_dir = os.path.join(main_dir, "data")
-# functions to create our resources
-def load_image(name, scale=1):
-    fullname = os.path.join(data_dir, name)
-    image = pg.image.load(fullname)
-    image = image.convert()
-
-    # size = image.get_size()
-    # size = (size[0] * scale, size[1] * scale)
-    # image = pg.transform.scale(image, size)
-
-    return image, image.get_rect()
+winner = 0
 
 def draw_board(board, x_offset, y_offset):
     # TODO
@@ -158,6 +147,10 @@ def choose_gamemode():
     
     return True
 
+MARGIN = 50
+X_OFFSET = 360
+CELL_SIZE = 60
+GRID_SIZE = 10
 def player_place_ships(screen, board, clock):
     """
     Outline for the rest of functionality
@@ -169,10 +162,6 @@ def player_place_ships(screen, board, clock):
     """
     ships = [Ship(i+1) for i in range(num_ships)]  # Add ship sizes based on your design
     font = pg.font.Font(None, 36)
-    MARGIN = 50
-    X_OFFSET = 360
-    CELL_SIZE = 60
-    GRID_SIZE = 10
 
     for ship in ships:
         placing = True
@@ -187,22 +176,25 @@ def player_place_ships(screen, board, clock):
                 
                 if event.type == pg.MOUSEBUTTONDOWN:
                     x, y = pg.mouse.get_pos()
-                    print(f"({x}, {y})")
                     grid_x = (x - X_OFFSET) // CELL_SIZE
                     grid_y = (y - MARGIN) // CELL_SIZE
+                    if DEBUG:
+                        print(f"({x}, {y})")
+                        print(f"({grid_x}, {grid_y})")
                     
                     if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
-                        print(f"({grid_x}, {grid_y})")
-                        # if board.place_ship(ship, grid_x, grid_y, horizontal):
-                        #     placing = False
-                        # else:
-                        #     print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
+                        if board.place_ship(ship, grid_x, grid_y, horizontal):
+                            placing = False
+                        else:
+                            print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
                 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_SPACE:
                         horizontal = not horizontal
             
             screen.fill("grey")
+            BACKGROUND.fill("grey")
+            screen.blit(BACKGROUND, (0, 0))
             draw_board(board, X_OFFSET, MARGIN)
 
             # Draw ship preview
@@ -271,7 +263,14 @@ def transition_between_turns(pnum):
 
         pg.display.flip()
 
-def player1_turn():
+def check_victory(board):
+    for row in board.gameBoard:
+        for cell in row:
+            if cell == 1:
+                return False  # If there is at least one ship that hasn't been hit, no victory yet.
+    return True  # If all ships have been hit, declare victory.
+
+def player_turn(board, pnum):
     '''
     Look at hits on their board
     Moves to attack phase and confirms hits
@@ -279,28 +278,45 @@ def player1_turn():
     on miss switch to transition screen
     switch to player 2 turn
     '''
-    pass
+    attacking = True
+    hit = False
+    while attacking:
+        events = pg.event.get()
+        for event in events:
+            if event.type == pg.QUIT:
+                pg.quit()
+                return False
 
-def player2_turn():
-    '''
-    Look at hits on their board
-    Moves to attack phase and confirms hits
-    Check victory condition
-    on miss switch to transition screen
-    switch to player 1 turn
-    '''
-    pass
+            if event.type == pg.MOUSEBUTTONDOWN:
+                x, y = pg.mouse.get_pos()
+                grid_x = (x - X_OFFSET) // CELL_SIZE  # Adjust grid based on offset and cell size
+                grid_y = (y - MARGIN) // CELL_SIZE
 
-def receive_attack(self, x, y):
-    if self.gameBoard[y][x] == 0:
-        self.gameBoard[y][x] = -1  # Miss
-        return False
-    elif isinstance(self.grid[y][x], Ship):
-        ship = self.gameBoard[y][x]
-        ship.hits += 1
-        self.gameBoard[y][x] = -2  # Hit
-        return True
-    return False
+                if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                    cell_value = board.gameBoard[grid_y][grid_x]
+                    if cell_value == 0:  # Miss
+                        print(f"Miss at ({grid_x}, {grid_y})")
+                        board.gameBoard[grid_y][grid_x] = -1
+                        attacking = False  # End turn after miss
+                    elif cell_value > 0:  # Hit
+                        print(f"Hit at ({grid_x}, {grid_y})")
+                        board.gameBoard[grid_y][grid_x] = -2
+                        hit = True
+                        # Check if the game is over
+                        if check_victory(board):
+                            globals().update(game_over=True)
+                            globals().update(winner=pnum)
+                            print(f"Player {pnum} wins!")
+                            return True
+                        else:
+                            attacking = False  # End turn after a successful hit
+                    else:
+                        print("Already attacked this cell")
+
+        draw_board(board, X_OFFSET, MARGIN)
+        pg.display.flip()
+        CLOCK.tick(60)
+    return hit
 
 def receive_attack(self, x, y):
     if self.gameBoard[y][x] == 0:
@@ -314,12 +330,12 @@ def receive_attack(self, x, y):
     return False
 
 def display_attack_result(attacking_player, hit):
-    font = pg.font.Font(None, 36)
+    font = pg.font.Font(None, 60)
     if hit:
         text = font.render("Hit!", True, RED)
     else:
         text = font.render("Miss!", True, BLUE)
-    text_rect = text.get_rect(center=(x, y))
+    text_rect = text.get_rect(center=(MIDDLE.x, MIDDLE.y))
     SCREEN.blit(text, text_rect)
     pg.display.flip()
     time.sleep(1.5)  # Display the result for 1.5 seconds
@@ -346,42 +362,63 @@ def run():
     if not choose_gamemode():
         return -1
 
-    # draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
-    transition_between_turns(3) #Test Call last number is the player who's turn is next
     player_place_ships(SCREEN, player1_board, CLOCK)
+    transition_between_turns(2)
+    player_place_ships(SCREEN, player2_board, CLOCK)
 
-    # placeholder loop until all other states are finished
-    while running:
-        events = pg.event.get()
-        for event in events:
-            if event.type == pg.QUIT:
-                running = False
+    global game_over
+    while not game_over:
         BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
         SCREEN.fill("grey")
         SCREEN.blit(BACKGROUND, (0, 0))
-        pw.update(events)  # Call once every loop to allow widgets to render and listen
-        
-        # flip() the display to put the work we did on screen
-        pg.display.flip()
-
-        tick = CLOCK.tick(60) # limits FPS to 60
-        # player1_place_ships(SCREEN,player1_board,CLOCK)
-
-    global game_over
-    globals().update(game_over=True)
-    while not game_over:
-        player_place_ships(SCREEN, player1_board, CLOCK)
         transition_between_turns(1)
-        player1_turn()
-        #display_attack_result(1)
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
+        hit = player_turn(player2_board, 1)
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
+        display_attack_result(1, hit)
+
+        if DEBUG:
+            print(player1_board.gameBoard)
+            print(player2_board.gameBoard)
+
         if game_over:
             break
 
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
         transition_between_turns(2)
-        player2_turn()
-        #display_attack_result(2)
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
+        hit = player_turn(player1_board, 2)
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
+        display_attack_result(2, hit)
+
+        if DEBUG:
+            print(player1_board.gameBoard)
+            print(player2_board.gameBoard)
+
         if game_over:
             break
+
+    # clear board
+    BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+    SCREEN.fill("grey")
+    SCREEN.blit(BACKGROUND, (0, 0))
+    # display winner
+    font = pg.font.Font(None, 60)
+    text = font.render(f"Game Over! Winner: Player {winner}", True, BLUE)
+    text_rect = text.get_rect(center=(MIDDLE.x, MIDDLE.y))
+    SCREEN.blit(text, text_rect)
+    pg.display.flip()
+    time.sleep(1.5)  # Display the result for 1.5 seconds
 
     pg.quit()
     return 0 # returned in good state
