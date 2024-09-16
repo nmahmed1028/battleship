@@ -193,7 +193,7 @@ def run():
     clock = pg.time.Clock() # keep to limit framerate
     running = True # track if loop should keep running
 
-    player1_board = Board()
+    player1_board = Board() # Initializes both players boards
     player2_board = Board()
 
     if not start_game(screen, background, clock):
@@ -202,7 +202,7 @@ def run():
     if not choose_gamemode(screen, background, clock):
         return
     
-    draw_board(screen,player1_board)
+    draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
 
     # placeholder loop until all other states are finished
     while running:
