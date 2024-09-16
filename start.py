@@ -160,8 +160,7 @@ def choose_gamemode():
     
     return True
 
-def player1_place_ships():
-    # TODO
+def player1_place_ships(screen, board, clock):
     """
     Outline for the rest of functionality
     Place Ship object
@@ -170,14 +169,126 @@ def player1_place_ships():
     'Player two press to start turn'
     Swithces to Player 2 start state when clicked
     """
-    pass
+    ships = [Ship(5), Ship(4), Ship(3), Ship(3), Ship(2)]  # Add ship sizes based on your design
+    font = pg.font.Font(None, 36)
+    MARGIN = 50
+    CELL_SIZE = 60
+    GRID_SIZE = 10
 
-def player2_place_ships():
+    for ship in ships:
+        placing = True
+        horizontal = True
+        
+        while placing:
+            events = pg.event.get()
+            for event in events:
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    return False
+                
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    x, y = pg.mouse.get_pos()
+                    grid_x = x // CELL_SIZE
+                    grid_y = (y - MARGIN) // CELL_SIZE
+                    
+                    if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                        if board.place_ship(ship, grid_x, grid_y, horizontal):
+                            placing = False
+                        else:
+                            print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
+                
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        horizontal = not horizontal
+            
+            screen.fill("grey")
+            draw_board(screen, board)
+            
+            # Draw ship preview
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            grid_x = mouse_x // CELL_SIZE
+            grid_y = (mouse_y - MARGIN) // CELL_SIZE
+            
+            if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                preview_ship = Ship(ship.size)
+                can_place = board.place_ship(preview_ship, grid_x, grid_y, horizontal)
+                preview_color = "green" if can_place else "red"
+                if horizontal:
+                    pg.draw.rect(screen, preview_color, (grid_x * CELL_SIZE, MARGIN + grid_y * CELL_SIZE, ship.size * CELL_SIZE, CELL_SIZE), 2)
+                else:
+                    pg.draw.rect(screen, preview_color, (grid_x * CELL_SIZE, MARGIN + grid_y * CELL_SIZE, CELL_SIZE, ship.size * CELL_SIZE), 2)
+            
+            # Draw instructions
+            text = font.render(f"Place your ship of size {ship.size}. Press SPACE to rotate.", True, "white")
+            screen.blit(text, (10, 10))
+            
+            pg.display.flip()
+
+    # Transition to player 2
+    transition_between_turns(screen, board, clock)
+
+def player2_place_ships(screen, board, clock):
     """
     Copy of Player 1 start
     Except confirmation sends the start to player 1 start
     """
-    pass
+    ships = [Ship(5), Ship(4), Ship(3), Ship(3), Ship(2)]  # Add ship sizes based on your design
+    font = pg.font.Font(None, 36)
+    MARGIN = 50
+    CELL_SIZE = 60
+    GRID_SIZE = 10
+
+    for ship in ships:
+        placing = True
+        horizontal = True
+        
+        while placing:
+            events = pg.event.get()
+            for event in events:
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    return False
+                
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    x, y = pg.mouse.get_pos()
+                    grid_x = x // CELL_SIZE
+                    grid_y = (y - MARGIN) // CELL_SIZE
+                    
+                    if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                        if board.place_ship(ship, grid_x, grid_y, horizontal):
+                            placing = False
+                        else:
+                            print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
+                
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_SPACE:
+                        horizontal = not horizontal
+            
+            screen.fill("grey")
+            draw_board(screen, board)
+            
+            # Draw ship preview
+            mouse_x, mouse_y = pg.mouse.get_pos()
+            grid_x = mouse_x // CELL_SIZE
+            grid_y = (mouse_y - MARGIN) // CELL_SIZE
+            
+            if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                preview_ship = Ship(ship.size)
+                can_place = board.place_ship(preview_ship, grid_x, grid_y, horizontal)
+                preview_color = "green" if can_place else "red"
+                if horizontal:
+                    pg.draw.rect(screen, preview_color, (grid_x * CELL_SIZE, MARGIN + grid_y * CELL_SIZE, ship.size * CELL_SIZE, CELL_SIZE), 2)
+                else:
+                    pg.draw.rect(screen, preview_color, (grid_x * CELL_SIZE, MARGIN + grid_y * CELL_SIZE, CELL_SIZE, ship.size * CELL_SIZE), 2)
+            
+            # Draw instructions
+            text = font.render(f"Place your ship of size {ship.size}. Press SPACE to rotate.", True, "white")
+            screen.blit(text, (10, 10))
+            
+            pg.display.flip()
+
+    # Transition to player 2
+    transition_between_turns(screen, board, clock)
 
 def transition_between_turns(pnum):
     """
@@ -274,6 +385,7 @@ def run():
     global game_over
     globals().update(game_over=True)
     while not game_over:
+        player1_place_ships(SCREEN, player1_board, CLOCK)
         transition_between_turns(1)
         player1_turn()
         display_attack_result(1)

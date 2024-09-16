@@ -83,30 +83,30 @@ class Board:
             if x + ship.size > 10: #10 is the grid size
                 return False
             for i in range(ship.size): 
-                if self.grid[y][x + i] != 0:
+                if self.gameBoard[y][x + i] != 0:
                     return False
             for i in range(ship.size):
-                self.grid[y][x + i] = ship
+                self.gameBoard[y][x + i] = ship
                 ship.positions.append((x + i, y))
         else:
             if y + ship.size > 10: # 10 is the grid size
                 return False
             for i in range(ship.size):
-                if self.grid[y + i][x] != 0:
+                if self.gameBoard[y + i][x] != 0:
                     return False
             for i in range(ship.size):
-                self.grid[y + i][x] = ship
+                self.gameBoard[y + i][x] = ship
                 ship.positions.append((x, y + i))
         self.ships.append(ship)
         return True
 
     def receive_attack(self, x, y):
-        if self.grid[y][x] == 0:
-            self.grid[y][x] = -1  # Miss
+        if self.gameBoard[y][x] == 0:
+            self.gameBoard[y][x] = -1  # Miss
             return False
-        elif isinstance(self.grid[y][x], Ship):
-            ship = self.grid[y][x]
+        elif isinstance(self.gameBoard[y][x], Ship):
+            ship = self.gameBoard[y][x]
             ship.hits += 1
-            self.grid[y][x] = -2  # Hit
+            self.gameBoard[y][x] = -2  # Hit
             return True
         return False
