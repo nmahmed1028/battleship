@@ -166,26 +166,35 @@ def player2_place_ships():
     """
     pass
 
-def transition_between_turns(screen, background, clock):
+def transition_between_turns(screen, background, clock,pnum):
     """
     Display whose turn it is, then wait until the enter
     button is pushed for confirmation to show that players
     attack/self board
     """
-    font = pg.font.Font(pg.font.get_default_font(), 48)
-    screen.fill("grey")
-    background.fill("grey")
+    hold = True
+    while hold:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                return False
+            
+            font = pg.font.Font(pg.font.get_default_font(), 48)
+            screen.fill("grey")
+            background.fill("grey")
+            text = font.render(f"Player {pnum}'s Turn Press Enter to continue", True, "white")
+            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+            background.blit(text, text_rect)
+            screen.blit(background, (0,0))
 
-    text = font.render(f"Player 1's Turn", True, "white")
-    text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-    background.blit(text, text_rect)
-    screen.blit(background, (0,0))
+            events = pg.event.get()
+            pw.update(events)  # Call once every loop to allow widgets to render and listen
 
-    events = pg.event.get()
-    pw.update(events)  # Call once every loop to allow widgets to render and listen
+            pg.display.flip()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    return
 
-    pg.display.flip()
-    time.sleep(2)  # Display the transition screen for 2 seconds
 
 def player1_turn():
     pass
@@ -219,8 +228,9 @@ def run():
     if not choose_gamemode(screen, background, clock):
         return -1
     
-    print("passed")
-    draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
+
+    # draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
+    # transition_between_turns(screen,background,clock,3) #Test Call last number is the player who's turn is next
 
     # placeholder loop until all other states are finished
     while running:
