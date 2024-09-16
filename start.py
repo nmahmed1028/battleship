@@ -113,7 +113,7 @@ def choose_gamemode():
         match = re.match("[1-5]", text)
         if match:
             print(f"num ships: {match[0]}")
-            globals().update(num_ships=match[0])
+            globals().update(num_ships=int(match[0]))
 
     shipTxtbox = TextBox(BACKGROUND, MIDDLE.x - 30, MIDDLE.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
     shipTxtbox.onSubmitParams = [shipTxtbox.text]
@@ -167,7 +167,7 @@ def player_place_ships(screen, board, clock):
     'Player two press to start turn'
     Swithces to Player 2 start state when clicked
     """
-    ships = [Ship(5), Ship(4), Ship(3), Ship(3), Ship(2)]  # Add ship sizes based on your design
+    ships = [Ship(i+1) for x in range(num_ships)]  # Add ship sizes based on your design
     font = pg.font.Font(None, 36)
     MARGIN = 50
     X_OFFSET = 360
@@ -197,7 +197,6 @@ def player_place_ships(screen, board, clock):
                         #     placing = False
                         # else:
                         #     print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
-                        print(board.gameBoard)
                 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_SPACE:
@@ -291,6 +290,17 @@ def player2_turn():
     switch to player 1 turn
     '''
     pass
+
+def receive_attack(self, x, y):
+    if self.gameBoard[y][x] == 0:
+        self.gameBoard[y][x] = -1  # Miss
+        return False
+    elif isinstance(self.grid[y][x], Ship):
+        ship = self.gameBoard[y][x]
+        ship.hits += 1
+        self.gameBoard[y][x] = -2  # Hit
+        return True
+    return False
 
 def receive_attack(self, x, y):
     if self.gameBoard[y][x] == 0:
