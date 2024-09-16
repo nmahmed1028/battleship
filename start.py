@@ -13,7 +13,19 @@ from battleship.board import Ship
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-MIDDLE = pg.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+MIDDLE = pg.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+
+SCREEN = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+BACKGROUND = pg.Surface(SCREEN.get_size()).convert()
+CLOCK = pg.time.Clock() # keep to limit framerate
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
+RED = (255, 0, 0)
+GRAY = (128, 128, 128)
+GREEN = (0, 255, 0)
 
 num_ships = None
 game_over = False
@@ -32,7 +44,7 @@ def load_image(name, scale=1):
 
     return image, image.get_rect()
 
-def draw_board(screen, board):
+def draw_board(board):
     # TODO
     my_font = pg.font.Font(pg.font.get_default_font(), 36)
     x_offset = 320
@@ -42,16 +54,17 @@ def draw_board(screen, board):
     for y in range(GRID_SIZE):
         for x in range(GRID_SIZE):
             rect = pg.Rect(x_offset + x * CELL_SIZE, MARGIN + y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-            pg.draw.rect(screen, (0, 0, 0), rect, 1)
+            pg.draw.rect(BACKGROUND, (0, 0, 0), rect, 1)
             if board.gameBoard[y][x] == -1: #-1 on the grid indicates a miss
-                pg.draw.circle(screen, (0,0,255), rect.center, CELL_SIZE // 4)
+                pg.draw.circle(BACKGROUND, (0,0,255), rect.center, CELL_SIZE // 4)
             elif board.gameBoard[y][x] == -2: #-2 on the grid indicates a hit
-                pg.draw.circle(screen, (255, 0, 0), rect.center, CELL_SIZE // 4)
+                pg.draw.circle(BACKGROUND, (255, 0, 0), rect.center, CELL_SIZE // 4)
             #elif isinstance(board.grid[y][x], Ship) and not hide_ships:
                 #pg.draw.rect(screen, GRAY, rect)
+    SCREEN.blit(BACKGROUND, (0,0))
 
 
-def start_game(screen, background, clock):
+def start_game():
     globals().update(game_over=False)
 
     running = True
@@ -66,16 +79,16 @@ def start_game(screen, background, clock):
                 running = False
                 return False
         
-        background.fill("grey")
-        screen.fill("grey")
+        BACKGROUND.fill("grey")
+        SCREEN.fill("grey")
 
         img = pg.image.load(os.path.join("data/battleship_fontbolt.png"))
         img.convert()
         img_size = img.get_size()
-        background.blit(img, (MIDDLE.x - img_size[0]/2, 100))
+        BACKGROUND.blit(img, (MIDDLE.x - img_size[0]/2, 100))
 
         if not startBtn.clicked:
-            startBtn.draw(background, events)
+            startBtn.draw(BACKGROUND, events)
             startBtn.btn.show()
             startBtn.btn.enable()
         else:
@@ -85,17 +98,17 @@ def start_game(screen, background, clock):
             startBtn.btn.disable()
 
 
-        screen.blit(background, (0, 0))
+        SCREEN.blit(BACKGROUND, (0, 0))
         pw.update(events)  # Call once every loop to allow widgets to render and listen
         
         # flip() the display to put the work we did on screen
         pg.display.flip()
 
-        tick = clock.tick(60) # limits FPS to 60
+        tick = CLOCK.tick(60) # limits FPS to 60
 
     return True
 
-def choose_gamemode(screen, background, clock):
+def choose_gamemode():
     running = True
     def txtCb(txt):
         text = ''.join(txt)
@@ -104,7 +117,7 @@ def choose_gamemode(screen, background, clock):
             print(f"num ships: {match[0]}")
             globals().update(num_ships=match[0])
 
-    shipTxtbox = TextBox(background, MIDDLE.x - 30, MIDDLE.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
+    shipTxtbox = TextBox(BACKGROUND, MIDDLE.x - 30, MIDDLE.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
     shipTxtbox.onSubmitParams = [shipTxtbox.text]
 
     while running:
@@ -116,18 +129,18 @@ def choose_gamemode(screen, background, clock):
                 running = False
                 return False
         
-        background.fill("grey")
-        screen.fill("grey")
+        BACKGROUND.fill("grey")
+        SCREEN.fill("grey")
 
         if not num_ships:
             img = pg.image.load(os.path.join("data/battleship_fontbolt.png"))
             img.convert()
             img_size = img.get_size()
-            background.blit(img, (MIDDLE.x - img_size[0]/2, 100))
+            BACKGROUND.blit(img, (MIDDLE.x - img_size[0]/2, 100))
 
             my_font = pg.font.Font(pg.font.get_default_font(), 36)
             text_surface = my_font.render('Choose number of ships [1-5]', True, (0, 0, 0))
-            background.blit(text_surface, (MIDDLE.x - text_surface.get_width()/2, MIDDLE.y + 150))
+            BACKGROUND.blit(text_surface, (MIDDLE.x - text_surface.get_width()/2, MIDDLE.y + 150))
 
             shipTxtbox.draw()
             shipTxtbox.show()
@@ -137,13 +150,13 @@ def choose_gamemode(screen, background, clock):
             shipTxtbox.hide()
             shipTxtbox.disable()
 
-        screen.blit(background, (0, 0))
+        SCREEN.blit(BACKGROUND, (0, 0))
         pw.update(events)  # Call once every loop to allow widgets to render and listen
         
         # flip() the display to put the work we did on screen
         pg.display.flip()
 
-        tick = clock.tick(60) # limits FPS to 60
+        tick = CLOCK.tick(60) # limits FPS to 60
     
     return True
 
@@ -166,7 +179,7 @@ def player2_place_ships():
     """
     pass
 
-def transition_between_turns(screen, background, clock,pnum):
+def transition_between_turns(pnum):
     """
     Display whose turn it is, then wait until the enter
     button is pushed for confirmation to show that players
@@ -178,59 +191,69 @@ def transition_between_turns(screen, background, clock,pnum):
             if event.type == pg.QUIT:
                 pg.quit()
                 return False
-            
-            font = pg.font.Font(pg.font.get_default_font(), 48)
-            screen.fill("grey")
-            background.fill("grey")
-            text = font.render(f"Player {pnum}'s Turn Press Enter to continue", True, "white")
-            text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-            background.blit(text, text_rect)
-            screen.blit(background, (0,0))
-
-            events = pg.event.get()
-            pw.update(events)  # Call once every loop to allow widgets to render and listen
-
-            pg.display.flip()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_RETURN:
                     return
 
+        font = pg.font.Font(pg.font.get_default_font(), 48)
+        SCREEN.fill("grey")
+        BACKGROUND.fill("grey")
+        text = font.render(f"Player {pnum}'s Turn Press Enter to continue", True, "white")
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        BACKGROUND.blit(text, text_rect)
+        SCREEN.blit(BACKGROUND, (0,0))
+
+        events = pg.event.get()
+        pw.update(events)  # Call once every loop to allow widgets to render and listen
+
+        pg.display.flip()
 
 def player1_turn():
+    '''
+    Look at hits on their board
+    Moves to attack phase and confirms hits
+    Check victory condition
+    on miss switch to transition screen
+    switch to player 2 turn
+    '''
     pass
 
 def player2_turn():
+    '''
+    Look at hits on their board
+    Moves to attack phase and confirms hits
+    Check victory condition
+    on miss switch to transition screen
+    switch to player 1 turn
+    '''
+    pass
+
     pass
 
 def run():
     # pygame setup
     pg.init()
     # set screen size
-    screen = pg.display.set_mode((1280, 720))
     pg.display.set_caption("Battleship")
 
-    screen.fill("grey")
-    background = pg.Surface(screen.get_size())
-    background = background.convert()
-    background.fill("grey")
-    screen.blit(background, (0,0))
+    SCREEN.fill("grey")
+    BACKGROUND.fill("grey")
+    SCREEN.blit(BACKGROUND, (0,0))
     pg.display.update()
 
-    clock = pg.time.Clock() # keep to limit framerate
     running = True # track if loop should keep running
 
     player1_board = Board() # Initializes both players boards
     player2_board = Board()
 
-    if not start_game(screen, background, clock):
+    if not start_game():
         return -1
 
-    if not choose_gamemode(screen, background, clock):
+    if not choose_gamemode():
         return -1
-    
 
     # draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
-    # transition_between_turns(screen,background,clock,3) #Test Call last number is the player who's turn is next
+    transition_between_turns(3) #Test Call last number is the player who's turn is next
 
     # placeholder loop until all other states are finished
     while running:
@@ -238,26 +261,28 @@ def run():
         for event in events:
             if event.type == pg.QUIT:
                 running = False
-        #background.fill("grey") These calls here need to be moved since they are interfering with the draw_board
-        #screen.fill("grey")
-        #screen.blit(background, (0, 0))
+        BACKGROUND.fill("grey") # These calls here need to be moved since they are interfering with the draw_board
+        SCREEN.fill("grey")
+        SCREEN.blit(BACKGROUND, (0, 0))
         pw.update(events)  # Call once every loop to allow widgets to render and listen
         
         # flip() the display to put the work we did on screen
         pg.display.flip()
 
-        tick = clock.tick(60) # limits FPS to 60
-    
+        tick = CLOCK.tick(60) # limits FPS to 60
+
     global game_over
     globals().update(game_over=True)
     while not game_over:
-        transition_between_turns()
+        transition_between_turns(1)
         player1_turn()
+        display_attack_result(1)
         if game_over:
             break
 
-        transition_between_turns()
+        transition_between_turns(2)
         player2_turn()
+        display_attack_result(2)
         if game_over:
             break
 
@@ -298,38 +323,18 @@ def run():
             
     #     if game_state == State.PLAYER1START:
     #         size = 500
-    #         boardGrid.draw(background, middle.x - size/2, middle.y - size/2, size)
+    #         boardGrid.draw(BACKGROUND, middle.x - size/2, middle.y - size/2, size)
 
     #         my_font = pg.font.Font(pg.font.get_default_font(), 56)
     #         text_surface = my_font.render('PLAYER 1, PLACE SHIPS', False, (0, 0, 0))
-    #         background.blit(text_surface, (middle.x - text_surface.get_width()/2, 30))
+    #         BACKGROUND.blit(text_surface, (middle.x - text_surface.get_width()/2, 30))
 
     #         #draw boxes ----> will have to replace w/ ship object       
     #         for ship in ships:
-    #             #pg.draw.rect(background, "purple", ship)
+    #             #pg.draw.rect(BACKGROUND, "purple", ship)
     #             if ships.index(ship) == active_ship:
-    #                 pg.draw.rect(background, "red", ship.rect.inflate(10, 10), 2)  # Draw a red outline on the ship player is actively moving
-    #             ship.draw(background)
-        
-    #     if game_state == State.PLAYER1TURN:
-    #         pass
-    #         '''
-    #         Look at hits on their board
-    #         Moves to attack phase and confirms hits
-    #         Check victory condition
-    #         on miss switch to transition screen
-    #         switch to player 2 turn
-    #         '''
-
-    #     if game_state == State.PLAYER2TURN:
-    #         pass
-    #         '''
-    #         Look at hits on their board
-    #         Moves to attack phase and confirms hits
-    #         Check victory condition
-    #         on miss switch to transition screen
-    #         switch to player 1 turn
-    #         '''
+    #                 pg.draw.rect(BACKGROUND, "red", ship.rect.inflate(10, 10), 2)  # Draw a red outline on the ship player is actively moving
+    #             ship.draw(BACKGROUND)
 
     pg.quit()
     return 0 # returned in good state
