@@ -381,6 +381,17 @@ def player2_turn():
     '''
     pass
 
+def receive_attack(self, x, y):
+    if self.gameBoard[y][x] == 0:
+        self.gameBoard[y][x] = -1  # Miss
+        return False
+    elif isinstance(self.grid[y][x], Ship):
+        ship = self.gameBoard[y][x]
+        ship.hits += 1
+        self.gameBoard[y][x] = -2  # Hit
+        return True
+    return False
+
 def display_attack_result(attacking_player, hit):
     font = pg.font.Font(None, 36)
     if hit:
