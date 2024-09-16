@@ -1,0 +1,6 @@
+This project uses pygame to create a Battleship game. 
+It contains a start screen that takes the player to a screen to input how many ships will be used in the game
+Based on this, the program will give each player the specified number of ships to place on the board
+The program then alternates between each player, giving them a chance to place their ships
+Once the ships are placed, the program alternates between giving each player a chance to attack, tells them if it miss or hit, and then switches to the next player
+This loop continues until one player wins
