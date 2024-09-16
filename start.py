@@ -339,7 +339,16 @@ def player2_turn():
     '''
     pass
 
-    pass
+def display_attack_result(attacking_player, hit):
+    font = pg.font.Font(None, 36)
+    if hit:
+        text = font.render("Hit!", True, RED)
+    else:
+        text = font.render("Miss!", True, BLUE)
+    text_rect = text.get_rect(center=(x, y))
+    SCREEN.blit(text, text_rect)
+    pg.display.flip()
+    time.sleep(1.5)  # Display the result for 1.5 seconds
 
 def run():
     # pygame setup
