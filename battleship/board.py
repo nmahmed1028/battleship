@@ -12,7 +12,6 @@ import os
 # 1 for miss
 # x for hit
 # Ship class for ship
-EMPTY_ROW = [0 for i in range(10)]
 
 class Ship:
     def __init__(self, size, x=0, y=0) -> None:
@@ -58,7 +57,7 @@ class Ship:
 class Board:
     def __init__(self) -> None:
         # always 10x10
-        self.gameBoard = [EMPTY_ROW for i in range(10)]
+        self.gameBoard =  [[0 for _ in range(10)] for _ in range(10)]
         self.ships = []
 
     def draw(self, screen, x, y, size=200):
@@ -86,7 +85,7 @@ class Board:
                 if self.gameBoard[y][x + i] != 0:
                     return False
             for i in range(ship.size):
-                self.gameBoard[y][x + i] = ship
+                self.gameBoard[y][x + i] = 1
                 ship.positions.append((x + i, y))
         else:
             if y + ship.size > 10: # 10 is the grid size
