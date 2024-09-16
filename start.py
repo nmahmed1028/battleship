@@ -167,7 +167,7 @@ def player_place_ships(screen, board, clock):
     'Player two press to start turn'
     Swithces to Player 2 start state when clicked
     """
-    ships = [Ship(i+1) for x in range(num_ships)]  # Add ship sizes based on your design
+    ships = [Ship(i+1) for i in range(num_ships)]  # Add ship sizes based on your design
     font = pg.font.Font(None, 36)
     MARGIN = 50
     X_OFFSET = 360
