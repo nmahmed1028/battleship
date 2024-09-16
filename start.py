@@ -383,56 +383,6 @@ def run():
         if game_over:
             break
 
-    # boardGrid = Board()
-    # ships = []
-    # #these lines draw boxes for testing mouse movement --> either replace w/ ship object or delete
-    # for i in range(5):
-    #     ship = Ship(i + 1)
-    #     #ship = pg.Rect(50 + i*40, 40, 30, 20)
-    #     ships.append(ship)
-    # active_ship = None
-
-    # while running:
-    #     # poll for events
-    #     # pg.QUIT event means the user clicked X to close the window
-    #     events = pg.event.get()
-    #     for event in events:
-    #         #mouse movement
-    #         '''ROTATION IS STILL WONKY, NEEDS TO BE TWEAKED'''
-    #         if event.type == pg.MOUSEBUTTONDOWN: #if mouse clicked
-    #             for num, ship in enumerate(ships): #track index # of ships
-    #                 if ship.collidepoint(event.pos): #checks for collision w/ mouse coords
-    #                     active_ship = num #if collide, update active_ship w/ ship's index val
-    #                     '''if keys[pg.K_r]: #if r key pressed while dragging
-    #                         ships[active_ship].rotate90() #rotate ship'''
-    #                     break
-
-    #         if event.type == pg.MOUSEMOTION and active_ship != None: #if mouse moved and there is active ship
-    #             ships[active_ship].move(event.rel) #pick ship from list and move it by same amount as mouse
-    #             if keys[pg.K_r]: #if r key pressed while dragging
-    #                         print("r pressed") #debugging
-    #                         ships[active_ship].rotate90() #rotate ship
-
-    #         if event.type == pg.MOUSEBUTTONUP: #if mouse released
-    #             if active_ship is not None: #if ship active
-    #                 active_ship = None #releases ship
-    #                 break
-            
-    #     if game_state == State.PLAYER1START:
-    #         size = 500
-    #         boardGrid.draw(BACKGROUND, middle.x - size/2, middle.y - size/2, size)
-
-    #         my_font = pg.font.Font(pg.font.get_default_font(), 56)
-    #         text_surface = my_font.render('PLAYER 1, PLACE SHIPS', False, (0, 0, 0))
-    #         BACKGROUND.blit(text_surface, (middle.x - text_surface.get_width()/2, 30))
-
-    #         #draw boxes ----> will have to replace w/ ship object       
-    #         for ship in ships:
-    #             #pg.draw.rect(BACKGROUND, "purple", ship)
-    #             if ships.index(ship) == active_ship:
-    #                 pg.draw.rect(BACKGROUND, "red", ship.rect.inflate(10, 10), 2)  # Draw a red outline on the ship player is actively moving
-    #             ship.draw(BACKGROUND)
-
     pg.quit()
     return 0 # returned in good state
 
