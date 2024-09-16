@@ -11,6 +11,8 @@ import os
 import re
 from battleship.board import Ship
 
+DEBUG = True
+
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 MIDDLE = pg.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
@@ -174,12 +176,13 @@ def player_place_ships(screen, board, clock):
                 
                 if event.type == pg.MOUSEBUTTONDOWN:
                     x, y = pg.mouse.get_pos()
-                    print(f"({x}, {y})")
                     grid_x = (x - X_OFFSET) // CELL_SIZE
                     grid_y = (y - MARGIN) // CELL_SIZE
+                    if DEBUG:
+                        print(f"({x}, {y})")
+                        print(f"({grid_x}, {grid_y})")
                     
                     if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
-                        print(f"({grid_x}, {grid_y})")
                         if board.place_ship(ship, grid_x, grid_y, horizontal):
                             placing = False
                         else:
@@ -362,8 +365,6 @@ def run():
     player_place_ships(SCREEN, player1_board, CLOCK)
     transition_between_turns(2)
     player_place_ships(SCREEN, player2_board, CLOCK)
-    # print(player1_board.gameBoard)
-    # print(player2_board.gameBoard)
 
     global game_over
     while not game_over:
@@ -380,8 +381,9 @@ def run():
         SCREEN.blit(BACKGROUND, (0, 0))
         display_attack_result(1, hit)
 
-        print(player1_board.gameBoard)
-        print(player2_board.gameBoard)
+        if DEBUG:
+            print(player1_board.gameBoard)
+            print(player2_board.gameBoard)
 
         if game_over:
             break
@@ -399,8 +401,9 @@ def run():
         SCREEN.blit(BACKGROUND, (0, 0))
         display_attack_result(2, hit)
 
-        print(player1_board.gameBoard)
-        print(player2_board.gameBoard)
+        if DEBUG:
+            print(player1_board.gameBoard)
+            print(player2_board.gameBoard)
 
         if game_over:
             break
