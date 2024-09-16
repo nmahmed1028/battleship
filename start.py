@@ -11,7 +11,7 @@ import os
 import re
 from battleship.board import Ship
 
-DEBUG = True
+DEBUG = False
 
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
@@ -167,6 +167,7 @@ def player_place_ships(screen, board, clock):
         placing = True
         horizontal = True
 
+        invalid_placement = None
         while placing:
             events = pg.event.get()
             for event in events:
@@ -185,7 +186,9 @@ def player_place_ships(screen, board, clock):
                     if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
                         if board.place_ship(ship, grid_x, grid_y, horizontal):
                             placing = False
+                            invalid_placement = None
                         else:
+                            invalid_placement = True
                             print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
                 
                 if event.type == pg.KEYDOWN:
@@ -205,20 +208,24 @@ def player_place_ships(screen, board, clock):
             if 0 <= (mouse_x - X_OFFSET) // CELL_SIZE < GRID_SIZE and 0 <= (mouse_y - MARGIN) // CELL_SIZE < GRID_SIZE:
                 can_place = True
                 if horizontal:
-                    if (mouse_x - X_OFFSET) // CELL_SIZE + ship.size > 10: #10 is the grid size
+                    gx = (mouse_x - X_OFFSET) // CELL_SIZE
+                    gy = (mouse_y - MARGIN) // CELL_SIZE
+                    if gx + ship.size > 10: #10 is the grid size
                         can_place = False
                     try:
-                        for i in range(ship.size): 
-                            if board.gameBoard[grid_y][grid_x + i] != 0:
+                        for i in range(ship.size):
+                            if board.gameBoard[gy][gx + i] != 0:
                                 can_place=False
                     except:
                         can_place = False
                 else:
-                    if grid_y + ship.size > 10: # 10 is the grid size
+                    gx = (mouse_x - X_OFFSET) // CELL_SIZE
+                    gy = (mouse_y - MARGIN) // CELL_SIZE
+                    if gy + ship.size > 10: # 10 is the grid size
                         can_place=False
                     try:
                         for i in range(ship.size):
-                            if board.gameBoard[grid_y + i][grid_x] != 0:
+                            if board.gameBoard[gy + i][gx] != 0:
                                 can_place=False
                     except:
                         can_place = False
@@ -231,6 +238,9 @@ def player_place_ships(screen, board, clock):
             # Draw instructions
             text = font.render(f"Place your ship of size {ship.size}. Press SPACE to rotate.", True, "white")
             screen.blit(text, (10, 10))
+            if invalid_placement is not None:
+                text = font.render(f"Invalid placement!", True, "red")
+                screen.blit(text, (10, 300))
             
             pg.display.flip()
 
@@ -298,7 +308,7 @@ def player_turn(board, pnum):
                         print(f"Miss at ({grid_x}, {grid_y})")
                         board.gameBoard[grid_y][grid_x] = -1
                         attacking = False  # End turn after miss
-                    elif cell_value > 0:  # Hit
+                    elif isinstance(cell_value, Ship) or cell_value > 0:  # Hit
                         print(f"Hit at ({grid_x}, {grid_y})")
                         board.gameBoard[grid_y][grid_x] = -2
                         hit = True
@@ -317,17 +327,6 @@ def player_turn(board, pnum):
         pg.display.flip()
         CLOCK.tick(60)
     return hit
-
-def receive_attack(self, x, y):
-    if self.gameBoard[y][x] == 0:
-        self.gameBoard[y][x] = -1  # Miss
-        return False
-    elif isinstance(self.grid[y][x], Ship):
-        ship = self.gameBoard[y][x]
-        ship.hits += 1
-        self.gameBoard[y][x] = -2  # Hit
-        return True
-    return False
 
 def display_attack_result(attacking_player, hit):
     font = pg.font.Font(None, 60)
