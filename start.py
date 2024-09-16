@@ -263,7 +263,7 @@ def transition_between_turns(pnum):
 def check_victory(board):
     for row in board.gameBoard:
         for cell in row:
-            if isinstance(cell, Ship):
+            if cell == 1:
                 return False  # If there is at least one ship that hasn't been hit, no victory yet.
     return True  # If all ships have been hit, declare victory.
 
@@ -276,6 +276,7 @@ def player_turn(board, pnum):
     switch to player 2 turn
     '''
     attacking = True
+    hit = False
     while attacking:
         events = pg.event.get()
         for event in events:
@@ -297,6 +298,7 @@ def player_turn(board, pnum):
                     elif cell_value > 0:  # Hit
                         print(f"Hit at ({grid_x}, {grid_y})")
                         board.gameBoard[grid_y][grid_x] = -2
+                        hit = True
                         # Check if the game is over
                         if check_victory(board):
                             globals().update(game_over=True)
@@ -311,7 +313,7 @@ def player_turn(board, pnum):
         draw_board(board, X_OFFSET, MARGIN)
         pg.display.flip()
         CLOCK.tick(60)
-    return False
+    return hit
 
 def receive_attack(self, x, y):
     if self.gameBoard[y][x] == 0:
@@ -377,6 +379,10 @@ def run():
         SCREEN.fill("grey")
         SCREEN.blit(BACKGROUND, (0, 0))
         display_attack_result(1, hit)
+
+        print(player1_board.gameBoard)
+        print(player2_board.gameBoard)
+
         if game_over:
             break
 
@@ -392,6 +398,10 @@ def run():
         SCREEN.fill("grey")
         SCREEN.blit(BACKGROUND, (0, 0))
         display_attack_result(2, hit)
+
+        print(player1_board.gameBoard)
+        print(player2_board.gameBoard)
+
         if game_over:
             break
 
