@@ -1,4 +1,5 @@
 # import platform
+import time
 import pygame as pg
 import pygame_widgets as pw
 from pygame_widgets.textbox import TextBox
@@ -99,8 +100,8 @@ def choose_gamemode(screen, background, clock):
     def txtCb(txt):
         text = ''.join(txt)
         match = re.match("[1-5]", text)
-        print(f"num ships: {match[0]}")
         if match:
+            print(f"num ships: {match[0]}")
             globals().update(num_ships=match[0])
 
     shipTxtbox = TextBox(background, MIDDLE.x - 30, MIDDLE.y + 200, 60, 80, fontSize=50, onSubmit=txtCb)
@@ -125,13 +126,14 @@ def choose_gamemode(screen, background, clock):
             background.blit(img, (MIDDLE.x - img_size[0]/2, 100))
 
             my_font = pg.font.Font(pg.font.get_default_font(), 36)
-            text_surface = my_font.render('Choose number of ships [1-5]', False, (0, 0, 0))
+            text_surface = my_font.render('Choose number of ships [1-5]', True, (0, 0, 0))
             background.blit(text_surface, (MIDDLE.x - text_surface.get_width()/2, MIDDLE.y + 150))
 
             shipTxtbox.draw()
             shipTxtbox.show()
             shipTxtbox.enable()
         else:
+            running = False
             shipTxtbox.hide()
             shipTxtbox.disable()
 
@@ -142,6 +144,8 @@ def choose_gamemode(screen, background, clock):
         pg.display.flip()
 
         tick = clock.tick(60) # limits FPS to 60
+    
+    return True
 
 def player1_place_ships():
     # TODO
@@ -168,7 +172,20 @@ def transition_between_turns(screen, background, clock):
     button is pushed for confirmation to show that players
     attack/self board
     """
-    pass
+    font = pg.font.Font(pg.font.get_default_font(), 48)
+    screen.fill("grey")
+    background.fill("grey")
+
+    text = font.render(f"Player 1's Turn", True, "white")
+    text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    background.blit(text, text_rect)
+    screen.blit(background, (0,0))
+
+    events = pg.event.get()
+    pw.update(events)  # Call once every loop to allow widgets to render and listen
+
+    pg.display.flip()
+    time.sleep(2)  # Display the transition screen for 2 seconds
 
 def player1_turn():
     pass
@@ -197,10 +214,10 @@ def run():
     player2_board = Board()
 
     if not start_game(screen, background, clock):
-        return
+        return -1
 
     if not choose_gamemode(screen, background, clock):
-        return
+        return -1
     
     draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
 
@@ -304,10 +321,12 @@ def run():
     #         '''
 
     pg.quit()
+    return 0 # returned in good state
 
 def main():
     # run main loop
-    run()
+    exit_state = run()
+    print(f"Exited with state {exit_state}")
 
 if __name__ == "__main__":
     main()
