@@ -1,0 +1,144 @@
+Estimated person-hours:
+Nayyir - 8
+Ashley - 4
+Aiham - 7
+Dylan - 4
+Damian - 8.25
+
+This estimate is based off of the self reported timings that each team member did
+but also taking into account the estimated amount of time everyone spent that wasn't recorded and time spent working 
+on the final day, which wasn't properly recorded
+(excluding Damian who recorded everything he did)
+
+
+Actual person-hours:
+This is based off of everyone self reporting their time spent on a shared Google Sheet
+
+Aiham
+    9/10/2024:
+    Coding: 20 minutes
+    Testing: 0 minutes
+    Meetings: 0 minutes
+    Total: 20 minutes
+
+    9/11/2024:
+    Coding: 75 minutes
+    Testing: 5 minutes
+    Meetings: 15 minutes
+    Total: 95 minutes
+
+    9/13/2024:
+    Coding: 45 minutes
+    Testing: 5 minutes
+    Meetings: 0 minutes
+    Total: 50 minutes
+
+    9/14/2024:
+    Coding: 10 minutes
+    Testing: 5 minutes
+    Meetings: 0 minutes
+    Total: 15 minutes
+
+    9/15/2024:
+    Coding: 0 minutes
+    Testing: 0 minutes
+    Meetings: 120 minutes
+    Total: 120 minutes
+
+Aiham Total: 300 minutes -> 5 hrs
+
+Ashley
+    9/11/2024:
+    Coding: 0 minutes
+    Testing: 0 minutes
+    Meetings: 15 minutes
+    Total: 15 minutes
+
+    9/14/2024:
+    Coding: 60 minutes
+    Testing: 5 minutes
+    Meetings: 0 minutes
+    Total: 65 minutes
+
+    9/15/2024:
+    Coding: 180 minutes
+    Testing: 20 minutes
+    Meetings: 120 minutes
+    Total: 320 minutes
+
+Ashley Total: 400 minutes -> 6.67 hrs
+
+Damian
+    9/11/2024:
+    Coding: 0 minutes
+    Testing: 0 minutes
+    Meetings: 15 minutes
+    Total: 15 minutes
+
+    9/13/2024:
+    Coding: 30 minutes
+    Testing: 0 minutes
+    Meetings: 0 minutes
+    Total: 30 minutes
+
+    9/14/2024:
+    Coding: 45 minutes
+    Testing: 0 minutes
+    Meetings: 0 minutes
+    Total: 45 minutes
+
+    9/15/2024:
+    Coding: 180 minutes
+    Testing: 105 minutes
+    Meetings: 120 minutes
+    Total: 405 minutes
+
+Damian Total: 495 min -> 8.25 hrs
+
+Dylan
+    9/10/2024:
+    Coding: 15 minutes
+    Testing: 0 minutes
+    Meetings: 0 minutes
+    Total: 15 minutes
+
+    9/11/2024:
+    Coding: 0 minutes
+    Testing: 0 minutes
+    Meetings: 15 minutes
+    Total: 15 minutes
+
+    9/15/2024:
+    Coding: 180 minutes
+    Testing: 105 minutes
+    Meetings: 120 minutes
+    Total: 405 minutes
+
+Dylan Total: 435 min -> 7.25 hrs
+
+Nayyir
+    9/11/2024:
+    Coding: 15 minutes
+    Testing: 5 minutes
+    Meetings: 15 minutes
+    Total: 25 minutes
+
+    9/13/2024:
+    Coding: 60 minutes
+    Testing: 5 minutes
+    Meetings: 0 minutes
+    Total: 65 minutes
+
+    9/14/2024:
+    Coding: 120 minutes
+    Testing: 15 minutes
+    Meetings: 0 minutes
+    Total: 135 minutes
+
+    9/15/2024:
+    Coding: 180 minutes
+    Testing: 30 minutes
+    Meetings: 120 minutes
+    Total: 360 minutes
+
+Nayyir Total: 585 min -> 9.25 hr
