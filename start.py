@@ -193,16 +193,18 @@ def player_place_ships(screen, board, clock):
                     
                     if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
                         print(f"({grid_x}, {grid_y})")
-                        # if board.place_ship(ship, grid_x, grid_y, horizontal):
-                        #     placing = False
-                        # else:
-                        #     print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
+                        if board.place_ship(ship, grid_x, grid_y, horizontal):
+                            placing = False
+                        else:
+                            print(f"Invalid placement at ({grid_x}, {grid_y}), horizontal: {horizontal}")
                 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_SPACE:
                         horizontal = not horizontal
             
             screen.fill("grey")
+            BACKGROUND.fill("grey")
+            screen.blit(BACKGROUND, (0, 0))
             draw_board(board, X_OFFSET, MARGIN)
 
             # Draw ship preview
@@ -346,9 +348,17 @@ def run():
     if not choose_gamemode():
         return -1
 
+    ships_placed = 0
+    while ships_placed < num_ships:
+        player_place_ships(SCREEN, player1_board, CLOCK)
+        transition_between_turns(2)
+        player_place_ships(SCREEN, player2_board, CLOCK)
+        transition_between_turns(1)
+        ships_placed += 1
+
     # draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
-    transition_between_turns(3) #Test Call last number is the player who's turn is next
-    player_place_ships(SCREEN, player1_board, CLOCK)
+    # transition_between_turns(3) #Test Call last number is the player who's turn is next
+    # player_place_ships(SCREEN, player1_board, CLOCK)
 
     # placeholder loop until all other states are finished
     while running:
