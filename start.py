@@ -35,10 +35,10 @@ def load_image(name, scale=1):
 def draw_board(screen, board):
     # TODO
     my_font = pg.font.Font(pg.font.get_default_font(), 36)
-    x_offset = 0
+    x_offset = 320
     GRID_SIZE = 10
     MARGIN = 50
-    CELL_SIZE = 40
+    CELL_SIZE = 60
     for y in range(GRID_SIZE):
         for x in range(GRID_SIZE):
             rect = pg.Rect(x_offset + x * CELL_SIZE, MARGIN + y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
@@ -219,6 +219,7 @@ def run():
     if not choose_gamemode(screen, background, clock):
         return -1
     
+    print("passed")
     draw_board(screen,player1_board) #Temporary call, not sure if this is where it should be but it isn't printing anywhere atm
 
     # placeholder loop until all other states are finished
@@ -227,9 +228,9 @@ def run():
         for event in events:
             if event.type == pg.QUIT:
                 running = False
-        background.fill("grey")
-        screen.fill("grey")
-        screen.blit(background, (0, 0))
+        #background.fill("grey") These calls here need to be moved since they are interfering with the draw_board
+        #screen.fill("grey")
+        #screen.blit(background, (0, 0))
         pw.update(events)  # Call once every loop to allow widgets to render and listen
         
         # flip() the display to put the work we did on screen
